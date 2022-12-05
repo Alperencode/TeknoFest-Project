@@ -33,18 +33,15 @@ def OutputTXT():
     """
     Output the result dictionary to a txt file
     """
-    if result_dictionary:
-        with open('output.txt', 'w',encoding='utf-8') as f:
-            for key, value in result_dictionary.items():
-                if type(result_dictionary[key]) == list:
-                    f.write(f"{key}: ")
-                    for item in result_dictionary[key]:
-                        f.write(f"{item}, ") if item != result_dictionary[key][-1] else f.write(f"{item}")
-                    f.write("\n")
-                else:
-                    f.write(f"{key}: {value}\n")
-    else:
-        pass
+    with open('output.txt', 'w',encoding='utf-8') as f:
+        for key, value in result_dictionary.items():
+            if type(result_dictionary[key]) == list:
+                f.write(f"{key}: ")
+                for item in result_dictionary[key]:
+                    f.write(f"{item}, ") if item != result_dictionary[key][-1] else f.write(f"{item}")
+                f.write("\n")
+            else:
+                f.write(f"{key}: {value}\n")
 
 def GetResult():
     """ Getter for the result dictionary """
