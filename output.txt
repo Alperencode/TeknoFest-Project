@@ -1,0 +1,6 @@
+ISBN-13: 9786053756040
+Title: Ben Robot
+Authors: Isaac Asimov
+Publisher: 
+Year: 2020
+Language: tr
