@@ -31,31 +31,6 @@ def ParseMeta(isbn_meta):
         for key, value in result_dictionary.items():
             print(f"{key}: {value}")
         last_book = isbn_meta["Title"]
-    
-def DetectFaces(img):
-    """
-    Detect faces in the frame
-    """
-    face_cascade = cv2.CascadeClassifier('sources/haarcascade_frontalface_default.xml')
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5)
-    for (x,y,w,h) in faces:
-            # Numbers of x_start - y_start - x_end - y_end
-            print("Face found: ",x, y, w, h)
-            
-            # The detected zones (Gray)
-            roi_gray = gray[y:y+h, x:x+w]
-
-            # Rectange BGR, thickness, width and height
-            color = (0, 0, 255)
-            border = 2
-            width = x + w
-            height = y + h
-
-            # Drawing rectangle
-            if faces.all():
-                cv2.rectangle(img, (x, y), (width, height),color, border)
-                cv2.putText(img,"Face Found",(x,y-5),cv2.FONT_HERSHEY_SIMPLEX,0.9,color=color,thickness=2)
 
 def DetectBarcode(img):
     """
@@ -68,26 +43,58 @@ def DetectBarcode(img):
         
         isbn_meta = ParseISBN(isbn)
 
-        if(isbn_meta):
+        if isbn_meta:
             ParseMeta(isbn_meta)
+            cv2.putText(img, isbn_meta["Title"], (pts2[0], pts2[1]-5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color=(255, 255, 255), thickness=2)
         else:
             print("Invalid ISBN")
 
-        pts = np.array([barcode.polygon],np.int32)
+        pts = np.array([barcode.polygon], np.int32)
         # pts = pts.reshape((-1,1,2))
         pts2 = barcode.rect
-        cv2.polylines(img,[pts],True,(255,255,255),5)
-        
-        if isbn_meta:
-            cv2.putText(img, isbn_meta["Title"],(pts2[0],pts2[1]-5),cv2.FONT_HERSHEY_SIMPLEX,0.9,color=(255,255,255),thickness=2)
+        cv2.polylines(img, [pts], True, (255,255,255), 5)
+
+def DetectFaces(img):
+    """
+    Detect faces in the frame
+    """
+    # Using the Haar Cascade Classifier
+    face_cascade = cv2.CascadeClassifier('sources/haarcascade_frontalface_default.xml')
+
+    # Applying grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Detecting faces
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5)
+    
+    for (x,y,w,h) in faces:
+            # Numbers of x_start - y_start - x_end - y_end
+            print("Face found: ", x, y, w, h)
+            
+            # The detected zones (Gray)
+            roi_gray = gray[y:y+h, x:x+w]
+
+            # Rectange BGR, thickness, width and height
+            color = (0, 0, 255)
+            border = 2
+            width = x + w
+            height = y + h
+
+            # Drawing rectangle
+            if faces.all():
+                cv2.rectangle(img, (x, y), (width, height), color, border)
+                cv2.putText(img, "Face Found", (x,y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color=color, thickness=2)
 
 def OutputTXT():
     """
     Output the result dictionary to a txt file
     """
-    if result_dictionary:
+    if GetResult():
+        # Create a txt file
         with open('output.txt', 'w', encoding='utf-8') as f:
+            # Write the result dictionary to the txt file
             for key, value in result_dictionary.items():
+                # If the value is a list, write the list items
                 if type(result_dictionary[key]) == list:
                     f.write(f"{key}: ")
                     for item in result_dictionary[key]:
@@ -97,5 +104,7 @@ def OutputTXT():
                     f.write(f"{key}: {value}\n")
 
 def GetResult():
-    """ Getter for the result dictionary """
+    """ 
+    Getter for the result dictionary 
+    """
     return result_dictionary

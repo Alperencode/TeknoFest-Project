@@ -18,10 +18,12 @@ def main():
         # Detect barcode
         DetectBarcode(img_flip)
 
+        # Show the frame
         cv2.imshow('User',img_flip)
         
         cv2.waitKey(1)
 
+    # Output the result
     OutputTXT()
 
 if __name__ == "__main__":
