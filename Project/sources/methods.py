@@ -39,9 +39,10 @@ def DetectBarcode(img):
     detector = cv2.barcode_BarcodeDetector()
 
     # Detecting the barcode
+    # Respectively: validation, barcode data, decode type, points of the barcode
     valid, decoded_info, decoded_type, corners = detector.detectAndDecode(gray)
 
-    # If barcode is detected
+    # If barcode is valid
     if valid:
         # Drawing the polygon around the barcode
         int_corners = np.array(corners, dtype=np.int32)
@@ -72,8 +73,8 @@ def DetectFaces(img):
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5)
     
     for (x,y,w,h) in faces:
-            # Numbers of x_start - y_start - x_end - y_end
-            # print("Face found: ", x, y, w, h)
+            # These variables represents the coordinates of the rectangle
+            # Respectively: x_start, y_start, x_end, y_end
             
             # The detected zones (Gray)
             roi_gray = gray[y:y+h, x:x+w]
