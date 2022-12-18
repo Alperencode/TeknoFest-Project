@@ -37,23 +37,46 @@ def DetectBarcode(img):
     Detect barcode in the frame
     """
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    detector = cv2.barcode_BarcodeDetector()
+
+    # Detecting the barcode
+    valid, decoded_info, decoded_type, corners = detector.detectAndDecode(gray)
+
+    # If barcode is detected
+    if valid:
+        # Drawing the polygon around the barcode
+        int_corners = np.array(corners, dtype=np.int32)
+        cv2.polylines(img, [int_corners], True, (0, 255, 0), 5)
+
+        # Parsing ISBN data
+        isbn_meta = ParseISBN(decoded_info[0])
+
+        # If ISBN is valid
+        if isbn_meta:
+            # Parsing the metadata
+            ParseMeta(isbn_meta)
+
+            # Writing the title of the book
+            cv2.putText(img, isbn_meta["Title"], (int(corners[0][0][0]), int(corners[0][0][1])-5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color=(0, 255, 0), thickness=2)
 
     for barcode in decode(gray):
-        isbn = barcode.data.decode('utf-8')
         
+        # Getting the points of the barcode
+        pts = np.array([barcode.polygon], np.int32)
+        pts2 = barcode.rect
+
+        # Drawing the polygon around the barcode
+        cv2.polylines(img, [pts], True, (0, 0, 255), 5)
+
+        # Parsing ISBN data
+        isbn = barcode.data.decode('utf-8')
         isbn_meta = ParseISBN(isbn)
 
+        # If ISBN is valid
         if isbn_meta:
             ParseMeta(isbn_meta)
-            cv2.putText(img, isbn_meta["Title"], (pts2[0], pts2[1]-5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color=(255, 255, 255), thickness=2)
-        else:
-            print("Invalid ISBN")
-
-        pts = np.array([barcode.polygon], np.int32)
-        # pts = pts.reshape((-1,1,2))
-        pts2 = barcode.rect
-        cv2.polylines(img, [pts], True, (255,255,255), 5)
-
+            cv2.putText(img, isbn_meta["Title"], (pts2[0], pts2[1]-5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color=(0, 0, 255), thickness=2)
+        
 def DetectFaces(img):
     """
     Detect faces in the frame
@@ -69,7 +92,7 @@ def DetectFaces(img):
     
     for (x,y,w,h) in faces:
             # Numbers of x_start - y_start - x_end - y_end
-            print("Face found: ", x, y, w, h)
+            # print("Face found: ", x, y, w, h)
             
             # The detected zones (Gray)
             roi_gray = gray[y:y+h, x:x+w]
