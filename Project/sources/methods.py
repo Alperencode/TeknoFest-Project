@@ -1,4 +1,3 @@
-from pyzbar.pyzbar import decode
 from isbnlib import *
 import cv2
 import numpy as np
@@ -59,24 +58,6 @@ def DetectBarcode(img):
             # Writing the title of the book
             cv2.putText(img, isbn_meta["Title"], (int(corners[0][0][0]), int(corners[0][0][1])-5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color=(0, 255, 0), thickness=2)
 
-    for barcode in decode(gray):
-        
-        # Getting the points of the barcode
-        pts = np.array([barcode.polygon], np.int32)
-        pts2 = barcode.rect
-
-        # Drawing the polygon around the barcode
-        cv2.polylines(img, [pts], True, (0, 0, 255), 5)
-
-        # Parsing ISBN data
-        isbn = barcode.data.decode('utf-8')
-        isbn_meta = ParseISBN(isbn)
-
-        # If ISBN is valid
-        if isbn_meta:
-            ParseMeta(isbn_meta)
-            cv2.putText(img, isbn_meta["Title"], (pts2[0], pts2[1]-5), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color=(0, 0, 255), thickness=2)
-        
 def DetectFaces(img):
     """
     Detect faces in the frame
